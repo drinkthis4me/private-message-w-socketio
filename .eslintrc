@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "env": {
+    "es2022": true,
+    "node": true
+  },
+  "extends":[
+    "plugin:vue/vue3-strongly-recommended",
+    "eslint:recommended",
+    "@vue/eslint-config-typescript",
+    "@vue/eslint-config-prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "parser": "vue-eslint-parser",
+  "rules": {
+    "semi": ["warn", "never"],
+    "quotes": [ 2, "single", {"avoidEscape": true}],
+    "no-unused-vars": "off"
+  },
+  "prettier/prettier": [
+    "warn",
+    {
+      "semi": false,
+      "singleQuote": true
+    }
+  ],
+  "ignorePatterns": ["node_modules", "build", "dist", "public"]
+}
