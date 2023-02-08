@@ -17,11 +17,28 @@ const usernameAlreadySelected = ref(false)
 
 function onUserNameSelection(username: string) {
   usernameAlreadySelected.value = true
-  socket.auth = { username }
+  socket.auth = { username: username }
   socket.connect()
 }
 
 onMounted(() => {
+  // fetch the session ID on app startup
+  const sessionID = localStorage.getItem('sessionID')
+  if (sessionID) {
+    usernameAlreadySelected.value = true
+    socket.auth = { sessionID: sessionID }
+    socket.connect()
+  }
+
+  socket.on('session', ({ sessionID, userID }) => {
+    // attach the session ID to the next reconnection attemps
+    socket.auth = { sessionID: sessionID }
+    // store it in the localStorage
+    localStorage.setItem('sessionID', sessionID)
+    // save the ID of the user
+    // socket.userID = userID /**Property 'userID' does not exist on type 'Socket<ServerToClientEvents, ClientToServerEvents>'. */
+  })
+
   // handler for connect_error
   socket.on('connect_error', (err: Error) => {
     if (err.message === 'invalid username')
