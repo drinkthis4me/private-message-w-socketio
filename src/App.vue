@@ -1,5 +1,8 @@
 <template>
   <div class="app">
+    <div v-show="errorStatus.status" class="errorInfo">
+      ERROR! {{ errorStatus.message }}
+    </div>
     <SelectUsername
       v-if="!usernameAlreadySelected"
       @submit-input="onUserNameSelection" />
@@ -12,18 +15,26 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import SelectUsername from './components/SelectUsername.vue'
 import Chat from './components/Chat.vue'
 import socket from './socket'
+import { useSocketStore } from './stores/useSocketStore'
+
+const socketStore = useSocketStore()
 
 const usernameAlreadySelected = ref(false)
 
+const errorStatus = ref({ status: false, message: '' })
+
 function onUserNameSelection(username: string) {
   usernameAlreadySelected.value = true
+  errorStatus.value.status = false
   socket.auth = { username: username }
   socket.connect()
 }
 
 onMounted(() => {
   // fetch the session ID on app startup
-  const sessionID = localStorage.getItem('sessionID')
+  socketStore.getSessionID()
+  const sessionID = socketStore.sessionID
+
   if (sessionID) {
     usernameAlreadySelected.value = true
     socket.auth = { sessionID: sessionID }
@@ -34,15 +45,19 @@ onMounted(() => {
     // attach the session ID to the next reconnection attemps
     socket.auth = { sessionID: sessionID }
     // store it in the localStorage
-    localStorage.setItem('sessionID', sessionID)
+    socketStore.setSessionID(sessionID)
     // save the ID of the user
     // socket.userID = userID /**Property 'userID' does not exist on type 'Socket<ServerToClientEvents, ClientToServerEvents>'. */
+    socketStore.setUserID(userID)
   })
 
   // handler for connect_error
   socket.on('connect_error', (err: Error) => {
-    if (err.message === 'invalid username')
+    if (err.message === 'invalid username') {
       usernameAlreadySelected.value = false
+      errorStatus.value.status = true
+      errorStatus.value.message = 'invalid username'
+    }
   })
 })
 
@@ -53,30 +68,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-header {
-  line-height: 1.5;
+body {
+  margin: 0;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+#app {
+  font-size: 14px;
 }
 </style>

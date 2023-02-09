@@ -26,7 +26,8 @@ io.use((socket, next) => {
   }
 
   const username = socket.handshake.auth.username;
-  if (!username) {
+  const isDuplicatedName = sessionStore.findDuplicateName(username)
+  if (!username || isDuplicatedName) {
     return next(new Error("invalid username"));
   }
 

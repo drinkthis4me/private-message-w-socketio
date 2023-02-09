@@ -8,11 +8,12 @@
         :selected="selectedUser === user"
         @select="onSelectUser(user)" />
     </div>
-    <MessagePanel
-      v-if="selectedUser"
-      :user="selectedUser"
-      @submit-input="onMessage"
-      class="right-panel" />
+    <div class="right-panel">
+      <MessagePanel
+        v-if="selectedUser"
+        :user="selectedUser"
+        @submit-input="onMessage" />
+    </div>
   </div>
 </template>
 
@@ -22,10 +23,13 @@ import UserInPanel from './User.vue'
 import MessagePanel from './MessagePanel.vue'
 import type { User } from '@/types/user'
 import socket from '@/socket'
+import { useSocketStore } from '../stores/useSocketStore'
+
+const socketStore = useSocketStore()
 
 const selectedUser = ref<User | null>(null)
 
-const users = ref<User[]>([])
+const users = socketStore.users
 
 function onMessage(content: string) {
   if (selectedUser.value) {
@@ -47,13 +51,13 @@ function onSelectUser(user: User) {
 
 onMounted(() => {
   socket.on('connect', () => {
-    users.value.forEach((user) => {
+    users.forEach((user) => {
       if (user.self) user.connected = true
     })
   })
 
   socket.on('disconnect', () => {
-    users.value.forEach((user) => {
+    users.forEach((user) => {
       if (user.self) user.connected = false
     })
   })
@@ -63,20 +67,20 @@ onMounted(() => {
     user.hasNewMessages = false
   }
 
-  socket.on('users', (newUsers) => {
-    newUsers.forEach((user) => {
-      for (let existingUser of users.value) {
+  socket.on('users', (usersList) => {
+    usersList.forEach((user) => {
+      for (let existingUser of users) {
         if (existingUser.userID === user.userID) {
           existingUser.connected = user.connected
           return
         }
       }
-      user.self = user.userID === localStorage.getItem('sessionID')
+      user.self = user.userID === socketStore.userID
       initReactiveProperties(user)
-      users.value.push(user)
+      users.push(user)
     })
     // put the current user first, and sort by username
-    users.value.sort((a, b) => {
+    users.sort((a, b) => {
       if (a.self) return -1
       if (b.self) return 1
       if (a.username < b.username) return -1
@@ -85,18 +89,18 @@ onMounted(() => {
   })
 
   socket.on('user connected', (user) => {
-    for (let existingUser of users.value) {
+    for (let existingUser of users) {
       if (existingUser.userID === user.userID) {
         existingUser.connected = true
         return
       }
     }
     initReactiveProperties(user)
-    users.value.push(user)
+    users.push(user)
   })
 
   socket.on('user disconnected', (id) => {
-    for (let user of users.value) {
+    for (let user of users) {
       if (user.userID === id) {
         user.connected = false
         break
@@ -105,8 +109,8 @@ onMounted(() => {
   })
 
   socket.on('private message', ({ content, from, to }) => {
-    for (let user of users.value) {
-      const fromSelf = localStorage.getItem('sessionID') === from
+    for (let user of users) {
+      const fromSelf = socketStore.sessionID === from
       if (user.userID === (fromSelf ? to : from)) {
         user.messages.push({ content, fromSelf })
         if (user !== selectedUser.value) user.hasNewMessages = true

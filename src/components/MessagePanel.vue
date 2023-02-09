@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="header">
       <StatusIcon :connected="user.connected" />{{ user.username }}
     </div>
@@ -16,9 +16,16 @@
       </li>
     </ul>
 
-    <form @submit.prevent="onSubmit" class="form">
-      <textarea v-model="input" placeholder="Your message..." class="input" />
-      <button type="submit" :disabled="!isValid" class="send-button">Send</button>
+    <form class="form">
+      <textarea
+        v-model="input"
+        @keyup.enter.exact.prevent="onSubmit"
+        placeholder="Your message..."
+        class="input"
+        autofocus></textarea>
+      <button type="submit" :disabled="!isValid" class="send-button">
+        Send
+      </button>
     </form>
   </div>
 </template>
@@ -51,6 +58,10 @@ const isValid = computed(() => input.value.length > 0)
 </script>
 
 <style scoped>
+.container {
+  display: grid;
+}
+
 .header {
   line-height: 40px;
   padding: 10px 20px;
@@ -64,6 +75,7 @@ const isValid = computed(() => input.value.length > 0)
 
 .message {
   list-style: none;
+  white-space: pre-line;
 }
 
 .sender {

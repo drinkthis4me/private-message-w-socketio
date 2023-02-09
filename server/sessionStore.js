@@ -21,6 +21,11 @@ class InMemorySessionStore extends SessionStore {
   findAllSessions() {
     return [...this.sessions.values()];
   }
+
+  findDuplicateName(name) {
+    const allValue = this.findAllSessions()
+    return allValue.some(v=>v.username === name)
+  }
 }
 
 module.exports = {
