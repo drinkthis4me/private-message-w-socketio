@@ -1,14 +1,15 @@
 <template>
   <div class="container">
-    <div class="header">
+    <div class="header" v-if="user">
       <StatusIcon :connected="user.connected" />{{ user.username }}
     </div>
-
-    <ul class="messages">
+    <div>{{ test }}</div>
+    <ul class="messages" v-if="user.messages">
       <li
         v-for="(message, index) in user.messages"
         :key="index"
         class="message">
+        <!-- <div>{{ index }} : {{ message }}</div> -->
         <div v-if="displaySender(message, index)" class="sender">
           {{ message.fromSelf ? '(yourself)' : user.username }}
         </div>
@@ -33,7 +34,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import StatusIcon from './StatusIcon.vue'
-import type { User, Message } from '../types/user'
+import type { User, Message } from '../../types/socket'
 const props = defineProps<{
   user: User
 }>()
@@ -48,13 +49,16 @@ function onSubmit() {
 }
 
 function displaySender(message: Message, index: number) {
-  return (
-    index === 0 ||
-    props.user.messages[index - 1].fromSelf !==
-      props.user.messages[index].fromSelf
-  )
+  const msgArray = props.user.messages
+  if (index === 0) return true
+
+  return msgArray && msgArray[index - 1].fromSelf !== msgArray[index].fromSelf
+    ? true
+    : false
 }
 const isValid = computed(() => input.value.length > 0)
+
+const test = props.user.messages
 </script>
 
 <style scoped>

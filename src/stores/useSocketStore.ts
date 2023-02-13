@@ -1,7 +1,7 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import socket from '@/socket'
-import type { User } from '@/types/user'
+import type { User } from '../../types/socket'
 
 export const useSocketStore = defineStore('socket', () => {
   const sessionID = ref<string>()

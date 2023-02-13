@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import StatusIcon from './StatusIcon.vue'
-import type { User } from '@/types/user'
+import type { User } from '../../types/socket'
 const props = defineProps<{
   selected: boolean
   user: User

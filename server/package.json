@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node dist/src/index.js"
   },
   "author": "Damien Arrachequesne <damien.arrachequesne@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "socket.io": "^4.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
   }
 }

@@ -21,7 +21,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import UserInPanel from './User.vue'
 import MessagePanel from './MessagePanel.vue'
-import type { User } from '@/types/user'
+import type { User } from '../../types/socket'
 import socket from '@/socket'
 import { useSocketStore } from '../stores/useSocketStore'
 
@@ -32,7 +32,7 @@ const selectedUser = ref<User | null>(null)
 const users = socketStore.users
 
 function onMessage(content: string) {
-  if (selectedUser.value) {
+  if (selectedUser.value && selectedUser.value.messages) {
     socket.emit('private message', {
       content,
       to: selectedUser.value.userID,
@@ -41,6 +41,10 @@ function onMessage(content: string) {
       content,
       fromSelf: true,
     })
+  } else {
+    console.log('>>> Error at onMessage')
+    console.log('>>> selectedUser is: ' + selectedUser.value)
+    console.log('>>> selectedUser.messages is: ' + selectedUser.value?.messages)
   }
 }
 
@@ -75,6 +79,7 @@ onMounted(() => {
           return
         }
       }
+      // initiate user.messages, user.hasNewMessages and user.self
       user.self = user.userID === socketStore.userID
       initReactiveProperties(user)
       users.push(user)
@@ -112,7 +117,7 @@ onMounted(() => {
     for (let user of users) {
       const fromSelf = socketStore.sessionID === from
       if (user.userID === (fromSelf ? to : from)) {
-        user.messages.push({ content, fromSelf })
+        if (user.messages) user.messages.push({ content, fromSelf })
         if (user !== selectedUser.value) user.hasNewMessages = true
         break
       }

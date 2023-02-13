@@ -1,5 +1,3 @@
-import type { User } from './user'
-
 export interface ServerToClientEvents {
   noArg: () => void
   basicEmit: (a: number, b: string, c: Buffer) => void
@@ -7,7 +5,7 @@ export interface ServerToClientEvents {
   session: (payload: SessionPayload) => void
   users: (newUsers: User[]) => void
   'user connected': (user: User) => void
-  'user disconnected': (id: string) => void
+  'user disconnected': (userID: string) => void
   'private message': (payload: MessagePayload) => void
 }
 
@@ -21,17 +19,34 @@ export interface InterServerEvents {
 }
 
 export interface SocketData {
-  name: string
-  age: number
+  sessionID: string;
+  userID: string;
+  username: string;
 }
 
+/** --- Custom types --- */
 interface SessionPayload {
   sessionID: string
   userID: string
 }
 
-interface MessagePayload {
+export interface MessagePayload {
   content: string
   from?: string
   to: string
 }
+
+export interface User {
+  username: string
+  userID: string
+  connected: boolean
+  self?: boolean
+  hasNewMessages?: boolean
+  messages?: Message[]
+}
+
+export type Message = {
+  content: string
+  fromSelf: boolean
+}
+
