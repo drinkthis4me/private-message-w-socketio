@@ -1,17 +1,18 @@
 <template>
   <div class="container">
-    <div class="header" v-if="user">
-      <StatusIcon :connected="user.connected" />{{ user.username }}
+    <div class="header" v-if="selectedUser">
+      <StatusIcon :connected="selectedUser.connected" />{{
+        selectedUser.username
+      }}
     </div>
-    <div>{{ test }}</div>
-    <ul class="messages" v-if="user.messages">
+    <ul class="messages" v-if="selectedUser && selectedUser.messages">
       <li
-        v-for="(message, index) in user.messages"
+        v-for="(message, index) in selectedUser.messages"
         :key="index"
         class="message">
         <!-- <div>{{ index }} : {{ message }}</div> -->
         <div v-if="displaySender(message, index)" class="sender">
-          {{ message.fromSelf ? '(yourself)' : user.username }}
+          {{ message.fromSelf ? '(yourself)' : selectedUser.username }}
         </div>
         {{ message.content }}
       </li>
@@ -35,9 +36,12 @@
 import { ref, computed } from 'vue'
 import StatusIcon from './StatusIcon.vue'
 import type { User, Message } from '../../types/socket'
-const props = defineProps<{
-  user: User
-}>()
+import { useSocketStore } from '@/stores/useSocketStore'
+import { storeToRefs } from 'pinia'
+
+const socketStore = useSocketStore()
+
+const { selectedUser } = storeToRefs(socketStore)
 
 const emits = defineEmits(['submitInput'])
 
@@ -49,7 +53,7 @@ function onSubmit() {
 }
 
 function displaySender(message: Message, index: number) {
-  const msgArray = props.user.messages
+  const msgArray = selectedUser.value?.messages
   if (index === 0) return true
 
   return msgArray && msgArray[index - 1].fromSelf !== msgArray[index].fromSelf
@@ -57,8 +61,6 @@ function displaySender(message: Message, index: number) {
     : false
 }
 const isValid = computed(() => input.value.length > 0)
-
-const test = props.user.messages
 </script>
 
 <style scoped>

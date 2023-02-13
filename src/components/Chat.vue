@@ -11,7 +11,6 @@
     <div class="right-panel">
       <MessagePanel
         v-if="selectedUser"
-        :user="selectedUser"
         @submit-input="onMessage" />
     </div>
   </div>
@@ -24,12 +23,11 @@ import MessagePanel from './MessagePanel.vue'
 import type { User } from '../../types/socket'
 import socket from '@/socket'
 import { useSocketStore } from '../stores/useSocketStore'
+import { storeToRefs } from 'pinia'
 
 const socketStore = useSocketStore()
 
-const selectedUser = ref<User | null>(null)
-
-const users = socketStore.users
+const { users, selectedUser } = storeToRefs(socketStore)
 
 function onMessage(content: string) {
   if (selectedUser.value && selectedUser.value.messages) {
@@ -55,13 +53,13 @@ function onSelectUser(user: User) {
 
 onMounted(() => {
   socket.on('connect', () => {
-    users.forEach((user) => {
+    users.value.forEach((user) => {
       if (user.self) user.connected = true
     })
   })
 
   socket.on('disconnect', () => {
-    users.forEach((user) => {
+    users.value.forEach((user) => {
       if (user.self) user.connected = false
     })
   })
@@ -73,7 +71,7 @@ onMounted(() => {
 
   socket.on('users', (usersList) => {
     usersList.forEach((user) => {
-      for (let existingUser of users) {
+      for (let existingUser of users.value) {
         if (existingUser.userID === user.userID) {
           existingUser.connected = user.connected
           return
@@ -82,10 +80,10 @@ onMounted(() => {
       // initiate user.messages, user.hasNewMessages and user.self
       user.self = user.userID === socketStore.userID
       initReactiveProperties(user)
-      users.push(user)
+      users.value.push(user)
     })
     // put the current user first, and sort by username
-    users.sort((a, b) => {
+    users.value.sort((a, b) => {
       if (a.self) return -1
       if (b.self) return 1
       if (a.username < b.username) return -1
@@ -94,18 +92,18 @@ onMounted(() => {
   })
 
   socket.on('user connected', (user) => {
-    for (let existingUser of users) {
+    for (let existingUser of users.value) {
       if (existingUser.userID === user.userID) {
         existingUser.connected = true
         return
       }
     }
     initReactiveProperties(user)
-    users.push(user)
+    users.value.push(user)
   })
 
   socket.on('user disconnected', (id) => {
-    for (let user of users) {
+    for (let user of users.value) {
       if (user.userID === id) {
         user.connected = false
         break
@@ -114,7 +112,7 @@ onMounted(() => {
   })
 
   socket.on('private message', ({ content, from, to }) => {
-    for (let user of users) {
+    for (let user of users.value) {
       const fromSelf = socketStore.sessionID === from
       if (user.userID === (fromSelf ? to : from)) {
         if (user.messages) user.messages.push({ content, fromSelf })

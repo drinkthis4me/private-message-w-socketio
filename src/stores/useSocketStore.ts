@@ -10,6 +10,8 @@ export const useSocketStore = defineStore('socket', () => {
 
   const users = ref<User[]>([])
 
+  const selectedUser = ref<User>()
+
   function getSessionID() {
     const sessionIDFromLocalStorage = localStorage.getItem('sessionID')
     if (sessionIDFromLocalStorage) {
@@ -30,6 +32,7 @@ export const useSocketStore = defineStore('socket', () => {
     sessionID,
     userID,
     users,
+    selectedUser,
 
     getSessionID,
     setSessionID,
