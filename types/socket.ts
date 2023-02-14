@@ -32,8 +32,9 @@ interface SessionPayload {
 
 export interface MessagePayload {
   content: string
-  from?: string
-  to: string
+  from: SocketData['userID']
+  to: SocketData['userID']
+  fromSelf?: boolean
 }
 
 export interface User {
@@ -42,11 +43,7 @@ export interface User {
   connected: boolean
   self?: boolean
   hasNewMessages?: boolean
-  messages?: Message[]
+  messages?: MessagePayload[]
 }
 
-export type Message = {
-  content: string
-  fromSelf: boolean
-}
 

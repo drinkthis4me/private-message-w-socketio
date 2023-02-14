@@ -10,7 +10,6 @@
         v-for="(message, index) in selectedUser.messages"
         :key="index"
         class="message">
-        <!-- <div>{{ index }} : {{ message }}</div> -->
         <div v-if="displaySender(message, index)" class="sender">
           {{ message.fromSelf ? '(yourself)' : selectedUser.username }}
         </div>
@@ -35,7 +34,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import StatusIcon from './StatusIcon.vue'
-import type { User, Message } from '../../types/socket'
+import type { MessagePayload } from '../../types/socket'
 import { useSocketStore } from '@/stores/useSocketStore'
 import { storeToRefs } from 'pinia'
 
@@ -52,7 +51,7 @@ function onSubmit() {
   input.value = ''
 }
 
-function displaySender(message: Message, index: number) {
+function displaySender(message: MessagePayload, index: number) {
   const msgArray = selectedUser.value?.messages
   if (index === 0) return true
 
