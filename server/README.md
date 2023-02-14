@@ -1,11 +1,15 @@
 # Socket.io server
+Install
+```sh
+npm i
+```
 
-compile files
-```bash
+Compile files
+```sh
 npx tsc
 ```
 
-start the server
-```bash
+Start the server
+```sh
 npm start
 ```

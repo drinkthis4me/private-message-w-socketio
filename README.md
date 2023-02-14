@@ -1,46 +1,37 @@
-# private-message-w-socketio
+# Private message with Socket.io
+An example project from [socket.io](https://socket.io/)'s examples section
 
-This template should help get you started developing with Vue 3 in Vite.
+Read [Private messaging from doc](https://socket.io/get-started/private-messaging-part-1/) for details
 
-## Recommended IDE Setup
+Rewritten in Vue3 + Typescript support
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+This repo stops at part III.
+# Server Setup
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
+install
 ```sh
-npm install
+cd server
+npm i
 ```
 
-### Compile and Hot-Reload for Development
+Compile .ts files (no hot-reload)
+```sh
+npx tsc
+```
 
+Start the server
+```sh
+npm start
+```
+
+# Client setup
+
+install
+```sh
+npm i
+```
+
+Start development (with hot-reload)
 ```sh
 npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
 ```
